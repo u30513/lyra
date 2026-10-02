@@ -1,55 +1,78 @@
 # Lyra
 
-**The thesis.** A company defines its own business process once - as a
-structured process definition - and from that point on, any employee can
-run it reliably through plain natural language, no matter how specific that
-process is to the company. If that holds, there's a product underneath it.
-Everything else is secondary to proving it.
+**An enterprise operations hub with a chat interface.**
 
-> This repository is the public write-up. The implementation is private.
+A team works from a single screen. Someone writes what they need done in plain
+language, and the application carries it out by coordinating the tools the team
+already uses: Jira, Slack, Outlook, Confluence, GitHub and others.
 
-## Why this, and why this way
+> Public write-up. The implementation is private.
 
-Most "AI agent" tools let a language model decide what action to take and
-then just... execute it. That's fast to build and fundamentally unreliable:
-the same request can resolve two different ways on two different days, and
-nobody can audit why. Lyra is built on the opposite assumption - **the LLM
-is only ever allowed to understand, never to act.** Intent recognition and
-slot-filling happen in the language layer; every actual decision about what
-runs, in what order, under what conditions, is made by a deterministic
-engine that has no model in its execution path at all. The process
-definition is the contract between the two, and it's the one artifact that
-isn't allowed to drift.
+---
 
-The reason this matters: a process that works for one company's onboarding
-flow is rarely identical to another's, even when the shape of the
-conversation is the same. The interesting engineering problem isn't "can an
-LLM understand a request" - that's mostly solved. It's whether the same
-natural-language interface can sit on top of arbitrarily different
-per-tenant configurations without the reliability degrading as the
-configuration space grows. That's the question the MVP is built to answer,
-not assume.
+## What it is, concretely
 
-## Architecture, at a glance
+A web and desktop application with an enterprise look and feel, presenting a
+chat interface or command bar as the single point of entry. Behind that
+interface it connects to the company's existing ecosystem through integrations,
+interprets the user's intent using integrated AI engines, and executes the
+corresponding actions in the relevant tools.
 
-- **A deterministic workflow engine**, with zero runtime dependencies,
-  that owns every state transition. It only executes from a validated
-  "ready" state - there's no code path where a model-generated action
-  reaches it directly.
-- **An LLM-backed understanding layer** that does exactly one job per
-  message: identify intent and fill in the slots the process needs, with
-  structured output and a deterministic template for the response. It
-  cannot call an action itself.
-- **A process-definition schema** as the central contract - the one thing
-  a Process Builder, the understanding layer, and the engine all read from,
-  so a schema change is a decision that has to be justified, not a drive-by
-  edit.
+It is delivered turnkey: pre-configured, contextualised and refined to fit the
+client by implementation engineers, so that it is accurate from the first day
+of use rather than after months of the customer tuning it themselves.
 
-## Where it stands
+## What it is not
 
-The engine and the chat/understanding layer are built and tested (unit
-tests plus a phrase-based evaluation harness targeting ≥95% reliability,
-the number the MVP lives or dies by). What's next is a minimal Process
-Builder - the editor that lets a company author its own process definition
-without touching code - followed by real connectors (Composio and
-third-party APIs) behind the engine's action-execution port.
+Positioning matters here, because every term in this space is overloaded.
+
+- **Not an AI company.** No in-house models are developed or trained.
+- **Not a communication tool, a task manager, a wiki or a mail client.**
+- **Not a replacement for anything.** None of the tools the company already
+  runs are displaced.
+
+## The exact role
+
+Lyra is the **administration and execution layer that sits above** those tools.
+It integrates third-party AI engines to interpret the user's instructions, and
+connects to the enterprise tools' APIs to carry out the resulting actions.
+
+The AI is an internal component of the product, not the product itself. That
+distinction drives the architecture: a language model is used for
+understanding, never granted authority to act on its own.
+
+---
+
+## How it works
+
+A single instruction can span several systems at once:
+
+> 💬 *"Prepare next week's sprint with the priority tasks from the backlog,
+> tell the team in the project's Slack channel, and schedule the planning
+> meeting for Monday at 10:00."*
+
+What the application does behind that one sentence:
+
+1. **Interprets the intent** using integrated AI engines.
+2. **Consults the company's persistent operational context** - teams, active
+   projects, internal rules and conventions, all configured in advance.
+3. **Selects the most appropriate AI engine for each microtask**, weighing
+   capability against cost.
+4. **Generates a structured execution plan and shows it to the user** before
+   anything happens.
+5. **Asks for human confirmation** on critical or write actions.
+6. **Executes the actions** in the target tools through managed connectors.
+7. **Records a full audit trail** of the process for the IT team.
+
+Steps 4, 5 and 7 are the ones that make this deployable inside an
+organisation. Nothing is written to a company system without a plan the user
+has seen and, where it matters, explicitly approved - and everything that
+happened remains reconstructable afterwards.
+
+---
+
+## Status
+
+In development. The deterministic execution engine and the natural-language
+understanding layer are built and under test; the configuration tooling and
+managed connectors to the enterprise tools are the current focus.
