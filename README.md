@@ -1,10 +1,12 @@
-# Lyra
+# Lyra - AI Operations Hub for Enterprise Teams
 
-**An enterprise operations hub with a chat interface.**
+**One screen. One instruction in plain language. Executed across the tools your
+team already runs** - Jira, Slack, Outlook, Confluence, GitHub and others.
 
-A team works from a single screen. Someone writes what they need done in plain
-language, and the application carries it out by coordinating the tools the team
-already uses: Jira, Slack, Outlook, Confluence, GitHub and others.
+Lyra reads intent with integrated AI engines, turns it into a plan, and carries
+that plan out through managed connectors. The plan is shown before anything
+happens, and anything that writes to a company system waits for a human to
+approve it.
 
 > Public write-up. The implementation is private.
 
